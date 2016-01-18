@@ -1,12 +1,13 @@
 #ifndef _MEGA_MOTO_H
 #define _MEGA_MOTO_H
 
-int enablePin = 8;
-int duty;
-int pWMPinA = 11;  // Timer2
-int pWMPinB = 3;
-
 // Should be called from main program's setup()
 void megaMotoSetup();
+
+// duty: 0-255, 0: stop; 255: maximum speed
+void forward(int duty);
+
+// duty: 0-255, 0: stop; 255: maximum speed
+void reverse(int duty);
 
 #endif

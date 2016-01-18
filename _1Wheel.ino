@@ -1,7 +1,9 @@
-#include "Sensor.h"
-  
+#include "Mpu6050.h"
+#include "MegaMoto.h"
+
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
+int duty;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -25,7 +27,7 @@ void setup() {
     while (Serial.available() && Serial.read()); // empty buffer again
 
     mpu6050Setup();
-
+    megaMotoSetup();
 }
 
 // ================================================================
@@ -40,9 +42,31 @@ void loop() {
 
     ledOn();
     readYpr();
+
+    for(duty = 0; duty <= 255; duty += 5){
+      forward(duty);
+      delay(200);
+    }
+    forward(255);
+    delay(2000);
+    for(duty = 255; duty>=0; duty -= 5){
+      forward(duty);
+    }
+    forward(0);
+    delay(500);
+    
+    for(duty = 0; duty <= 255; duty += 5){
+      reverse(duty);
+      delay(200);
+    }
+    reverse(255);
+    delay(2000);
+    for(duty = 255; duty>=0; duty -= 5){
+      reverse(duty);
+    }
+    reverse(0);
+    delay(500);
 }
-
-
 
 // ================================================================
 // ===                    LED                                   ===

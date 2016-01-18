@@ -1,47 +1,32 @@
+#include <Arduino.h>
+
 #include "MegaMoto.h"
 
-void setup() {                
+int enablePin = 8;
+int pWMPinA = 11;  // Timer2
+int pWMPinB = 3;
+
+void megaMotoSetup() {                
   // initialize the digital pin as an output.
   // Pin 13 has an LED connected on most Arduino boards:
-  pinMode(enablePin, OUTPUT);     
   pinMode(pWMPinA, OUTPUT);
   pinMode(pWMPinB, OUTPUT);
-  setPwmFrequency(pWMPinA, 8);  // change Timer2 divisor to 8 gives 3.9kHz PWM freq
+//  setPwmFrequency(pWMPinA, 8);  // change Timer2 divisor to 8 gives 3.9kHz PWM freq
 }
 
-void loop() {
-    // To drive the motor in H-bridge mode
-    // the power chip inputs must be opposite polarity
-    // and the Enable input must be HIGH
-    digitalWrite(enablePin, HIGH);
-    analogWrite(pWMPinB, 0);
-    for(duty = 0; duty <= 255; duty += 5){
-      analogWrite(pWMPinA, duty);
-      delay(200);
-    }
-    analogWrite(pWMPinA, 255);
-    CRaw = analogRead(CPin);
-    delay(2000);
-    for(duty = 255; duty>=0; duty -= 5){
-      analogWrite(pWMPinA, duty);   
-      delay(200);   
-    }
-    analogWrite(pWMPinA, 0);
-    delay(500);
-    // Toggle enable to reset the power chips if we have had 
-    // an overcurrent or overtemp fault
-    digitalWrite(enablePin, LOW);
-    delay(500);
-    
-    // Swap pins to make the motor reverse
-    if(pWMPinA == 11) {
-      pWMPinA = 3;
-      pWMPinB = 11;
-    } else {
-      pWMPinA = 11;
-      pWMPinB = 3;
-    }
+
+// duty: 0-255, 0: stop; 255: maximum speed
+void forward(int duty) {
+  analogWrite(pWMPinB, 0);
+  analogWrite(pWMPinA, duty);
 }
+
+// duty: 0-255, 0: stop; 255: maximum speed
+void reverse(int duty) {
+  analogWrite(pWMPinA, 0);
+  analogWrite(pWMPinB, duty);
+}
+
 /*
  * Divides a given PWM pin frequency by a divisor.
  * 
@@ -105,22 +90,3 @@ void setPwmFrequency(int pin, int divisor) {
     TCCR2B = TCCR2B & 0b11111000 | mode; // Timer2
   }
 }
-        // set our DMP Ready flag so the main loop() function knows it's okay to use it
-        Serial.println(F("DMP ready! Waiting for first interrupt..."));
-        dmpReady = true;
-
-        // get expected DMP packet size for later comparison
-        packetSize = mpu.dmpGetFIFOPacketSize();
-    } else {
-        // ERROR!
-        // 1 = initial memory load failed
-        // 2 = DMP configuration updates failed
-        // (if it's going to break, usually the code will be 1)
-        Serial.print(F("DMP Initialization failed (code "));
-        Serial.print(devStatus);
-        Serial.println(F(")"));
-    }
-
-}
-
-
