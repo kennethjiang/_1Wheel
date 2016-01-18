@@ -1,5 +1,5 @@
-#ifndef SENSOR_H
-#define SENSOR_H
+#ifndef _MPU6050_H
+#define _MPU6050_H
 
 // supply your own gyro offsets by redefining them.
 #define X_GYRO_OFFSET 220

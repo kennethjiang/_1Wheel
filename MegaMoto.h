@@ -1,5 +1,5 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#ifndef _MEGA_MOTO_H
+#define _MEGA_MOTO_H
 
 int enablePin = 8;
 int duty;
