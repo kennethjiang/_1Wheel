@@ -6,6 +6,11 @@ int enablePin = 8;
 int pWMPinA = 11;  // Timer2
 int pWMPinB = 3;
 
+// ================================================================
+// ===        SETUP                                             ===
+// ================================================================
+
+
 void megaMotoSetup() {                
   // initialize the digital pin as an output.
   // Pin 13 has an LED connected on most Arduino boards:
@@ -13,6 +18,35 @@ void megaMotoSetup() {
   pinMode(pWMPinB, OUTPUT);
 //  setPwmFrequency(pWMPinA, 8);  // change Timer2 divisor to 8 gives 3.9kHz PWM freq
 }
+
+
+
+// ================================================================
+// ===        CAP MOTOR OUTPUT CHANGE                           ===
+// ================================================================
+
+#define MAX_DUTY_CHANGE_RATE 10.0  // Change of duty should not exceed 10 per second
+int lastDuty = 0;
+long lastDutyTime = 0;
+
+int cappedDuty(int duty) {
+  long elapsedTime = millis() - lastDutyTime;
+  float maxAllowedChange = ((float) elapsedTime) / 1000.0 * MAX_DUTY_CHANGE_RATE;
+  
+  if (abs(duty-lastDuty) > maxAllowedChange) {
+    int posOrNeg = (duty-lastDuty) > 0 ? 1.0 : -1.0;
+    duty = lastDuty + (int) (maxAllowedChange + posOrNeg);
+  }
+
+  lastDuty = duty;
+  lastDutyTime = millis();
+
+  return duty;
+}
+
+// ================================================================
+// ===        MOTOR DRIVER                                      ===
+// ================================================================
 
 
 // duty: 0-255, 0: stop; 255: maximum speed
@@ -26,6 +60,23 @@ void reverse(int duty) {
   analogWrite(pWMPinA, 0);
   analogWrite(pWMPinB, duty);
 }
+
+void driveMotor(int duty) {
+  duty = cappedDuty(duty);
+
+  if (duty >= 0) {
+    forward(duty);
+  } else {
+    reverse(duty*-1);
+  }
+}
+
+void shutoff() {
+  analogWrite(pWMPinA, 0);
+  analogWrite(pWMPinB, 0);
+}
+
+
 
 /*
  * Divides a given PWM pin frequency by a divisor.

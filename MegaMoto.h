@@ -4,10 +4,13 @@
 // Should be called from main program's setup()
 void megaMotoSetup();
 
-// duty: 0-255, 0: stop; 255: maximum speed
-void forward(int duty);
 
-// duty: 0-255, 0: stop; 255: maximum speed
-void reverse(int duty);
+// duty: -255 - 255
+//    0: stop
+//  255: forward, max speed
+// -255: reverse, max speed
+void driveMotor(int duty);
+
+void shutoff();
 
 #endif
