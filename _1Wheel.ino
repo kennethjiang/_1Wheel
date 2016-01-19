@@ -3,15 +3,14 @@
 
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
+#define SPEED_GAIN 6.0
 #define ACCEL_GAIN 18.0
 #define GYRO_GAIN 0.2
-#define CYCLE_TIME 10   //10ms per cycle of adjusting speed
+#define CYCLE_TIME 20   //10ms per cycle of adjusting speed
 
 float desiredSpeed = 0.0;
 
 float overallGain = 0.3;
-
-long lastCycle = 0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -50,10 +49,9 @@ void loop() {
     }
     
     float angle = ypr[2]; // pitch is how much the board tilts
-    int16_t *gyro = lastGyroReadking();
-    int16_t angleRate = gyro[0];  // gyro_x is the rate of tilting
+    int16_t angleRate = lastGyroReading()[0];  // gyro_x is the rate of tilting
 
-    // balance_torque is the output to motor just to keep it balanced
+    // balanceTorque is the output to motor just to keep it balanced
     float balanceTorque = (float) (ACCEL_GAIN * angle) + (GYRO_GAIN * angleRate);
 
     //this is not current speed. We do not know actual speed as we have no wheel rotation encoders. This is a type of accelerator pedal effect:
@@ -67,20 +65,33 @@ void loop() {
     //The 0.999 means that if you bring board level after a long period tilted forwards, the cur_speed value magically decays away to nothing and your board
     //is now not only stationary but also level!
   
-    desiredSpeed = (float) (desiredSpeed + (angle * 6 * CYCLE_TIME)) * 0.999;
+    desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN * CYCLE_TIME)) * 0.999;
 
-    float level = (float)(balanceTorque + desiredSpeed) * overallGain;
+    float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
 
-    Serial.println(level);
-    driveMotor((int) level);
+    Serial.println(duty);
+    driveMotor((int) duty);
 
-    long remainingCycle = millis() - lastCycle;
-    if (remainingCycle > 0) {
-      delay(remainingCycle);
-    }
+    fillCycle();
 }
 
 
+// ================================================================
+// ===                    CYCLE CONTROLLER                      ===
+// ================================================================
+
+long lastCycle = 0;
+
+void fillCycle() {
+    long remainingCycle = lastCycle + CYCLE_TIME - millis();
+    if (remainingCycle > 0) {
+      delay(remainingCycle);
+    } else {
+      Serial.print("ERROR: run out of cycle by: ");
+      Serial.println(remainingCycle);
+    }
+    lastCycle = millis();
+}
 
 // ================================================================
 // ===                    LED                                   ===

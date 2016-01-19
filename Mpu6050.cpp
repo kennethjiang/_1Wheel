@@ -316,7 +316,7 @@ float *readYpr() {
     return ypr;
 }
 
-int16_t *lastGyroReadking() {
+int16_t *lastGyroReading() {
     mpu.dmpGetGyro(gyro, fifoBuffer);
     return gyro;
 }
@@ -351,7 +351,6 @@ bool hasSensorStabilized() {
     double delta = abs(quaternion->w-lastQ.w) + abs(quaternion->x-lastQ.x) + abs(quaternion->y-lastQ.y) + abs(quaternion->z-lastQ.z);
     lastQ = *quaternion;
     delta *= 1000;
-    Serial.println(delta);
     
     if (delta > 1.5) {  // experimential. You may need to adjust it.
         continuousSamplesBelowThreshold = 0;
