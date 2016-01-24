@@ -313,10 +313,11 @@ float *readYpr() {
     
     mpu.dmpGetGravity(&gravity, quaternion);
     mpu.dmpGetYawPitchRoll(ypr, quaternion, &gravity);
+    
     return ypr;
 }
 
-int16_t *lastGyroReading() {
+int16_t *readGyro() {
     mpu.dmpGetGyro(gyro, fifoBuffer);
     return gyro;
 }

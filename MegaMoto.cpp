@@ -25,7 +25,8 @@ void megaMotoSetup() {
 // ===        CAP MOTOR OUTPUT CHANGE                           ===
 // ================================================================
 
-#define MAX_DUTY_CHANGE_RATE 10.0  // Change of duty should not exceed 10 per second
+#define MAX_DUTY_CHANGE_RATE 1000.0  // Change of duty should not exceed 10 per second
+#define MAX_DUTY 100.0 // CAP max duty for testing
 int lastDuty = 0;
 long lastDutyTime = 0;
 
@@ -35,9 +36,20 @@ int cappedDuty(int duty) {
   
   if (abs(duty-lastDuty) > maxAllowedChange) {
     int posOrNeg = (duty-lastDuty) > 0 ? 1.0 : -1.0;
-    duty = lastDuty + (int) (maxAllowedChange + posOrNeg);
+    duty = lastDuty + (int) (maxAllowedChange * posOrNeg);
+    Serial.println("CAPPED duty change rate");
   }
 
+  if (duty > MAX_DUTY) {
+    duty = MAX_DUTY;
+    Serial.println("CAPPED duty");
+  }
+
+  if (duty < MAX_DUTY * -1) {
+    duty = MAX_DUTY * -1;
+    Serial.println("CAPPED duty");
+  }
+  
   lastDuty = duty;
   lastDutyTime = millis();
 

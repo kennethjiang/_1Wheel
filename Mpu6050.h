@@ -22,6 +22,6 @@ bool hasSensorStabilized();
 // return NULL if anything has gone wrong
 float *readYpr();
 
-int16_t *lastGyroReading();
+int16_t *readGyro();
 
 #endif
