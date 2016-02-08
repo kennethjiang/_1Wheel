@@ -53,6 +53,11 @@ void loop() {
     float angle = ypr[2]; // pitch is how much the board tilts, in radians
     float angleRate = float(readGyro()[0]) * M_PI / 180.0;  // gyro_x is the rate of tilting, in radians
 
+    if (!shouldBeActivated(angle)) {
+      shutoff();
+      return;
+    }
+
     // balanceTorque is the output to motor just to keep it balanced
     float balanceTorque = ACCEL_GAIN * angle + GYRO_GAIN * angleRate;
 
@@ -86,6 +91,54 @@ void loop() {
 //    fillUpCycle();
 }
 
+
+// ================================================================
+// ===                    ACTIVATION                           ====
+// ================================================================
+
+#define ACTIVE_ANGLE 10 * M_PI / 180.0
+#define ACTIVE_DUR 100
+#define DEACTIVE_ANGLE 15 * M_PI / 180.0
+#define DEACTIVE_DUR 50
+
+bool activated = false;
+long lastChangedAt = 0;
+
+// Motor should be activated only when angle is < ACTIVE_ANGLE for > ACTIVE_DUR ms,
+//   or be deactivated when angle is > DEACTIVE_ANGLE for > DEACTIVE_DUR ms
+bool shouldBeActivated(float angle) {
+  
+  if (!activated) {
+
+    if (abs(angle) > ACTIVE_ANGLE)
+      return false;
+
+    if (lastChangedAt == 0)
+      lastChangedAt = millis();
+    else {
+      if ((millis() - lastChangedAt) >= ACTIVE_DUR) {
+        activated = true;
+        lastChangedAt = 0;
+      }
+    }
+
+  } else {
+
+    if (abs(angle) < ACTIVE_ANGLE)
+      return true;
+
+    if (lastChangedAt == 0)
+      lastChangedAt = millis();
+    else {
+      if ((millis() - lastChangedAt) > DEACTIVE_DUR) {
+        activated = false;
+        lastChangedAt = 0;
+      }
+    }
+  }
+
+  return activated;
+}
 
 // ================================================================
 // ===                    LED                                   ===
