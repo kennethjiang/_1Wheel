@@ -74,6 +74,7 @@ void reverse(int duty) {
 }
 
 void driveMotor(int duty) {
+  duty *= DIRECTION;
   duty = cappedDuty(duty);
 
   if (duty >= 0) {

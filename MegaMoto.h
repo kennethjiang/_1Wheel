@@ -1,6 +1,8 @@
 #ifndef _MEGA_MOTO_H
 #define _MEGA_MOTO_H
 
+#define DIRECTION -1
+
 // Should be called from main program's setup()
 void megaMotoSetup();
 

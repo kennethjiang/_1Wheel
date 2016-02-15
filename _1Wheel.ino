@@ -3,14 +3,16 @@
 
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
-#define SPEED_GAIN 0.006
-#define ACCEL_GAIN 18.0
-#define GYRO_GAIN 5.0
+//#define SPEED_GAIN 0.006
+#define SPEED_GAIN 0.000
+#define ANGLE_GAIN 18.0
+#define ANGLE_RATE_GAIN 5.0
 
+#define ANGLE_OFFSET = -0.03054  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
 float desiredSpeed = 0.0;
 
-float overallGain = 3.0;
+float overallGain = 16.0;
 
 long lastCycle = 0;
 
@@ -50,16 +52,17 @@ void loop() {
        return;
     }
 
-    float angle = ypr[2]; // pitch is how much the board tilts, in radians
+    float angle = ypr[2] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians
     float angleRate = float(readGyro()[0]) * M_PI / 180.0;  // gyro_x is the rate of tilting, in radians
 
     if (!shouldBeActivated(angle)) {
+      desiredSpeed = 0.0;
       shutoff();
       return;
     }
 
     // balanceTorque is the output to motor just to keep it balanced
-    float balanceTorque = ACCEL_GAIN * angle + GYRO_GAIN * angleRate;
+    float balanceTorque = ANGLE_GAIN * angle + ANGLE_RATE_GAIN * angleRate;
 
     //this is not current speed. We do not know actual speed as we have no wheel rotation encoders. This is a type of accelerator pedal effect:
     //this variable increases with each loop of the program IF board is deliberately held at an angle (by rider for example)
@@ -79,16 +82,10 @@ void loop() {
       
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
 
-//    Serial.print("Angle: ");
-//    Serial.print(angle, 6);
-//    Serial.print("  Rate: ");
     Serial.println(duty, 6);
-//    Serial.print("  Torque: ");
-//    Serial.println(balanceTorque, 6);
 
     driveMotor((int) duty);
 
-//    fillUpCycle();
 }
 
 
@@ -98,8 +95,8 @@ void loop() {
 
 #define ACTIVE_ANGLE 10 * M_PI / 180.0
 #define ACTIVE_DUR 100
-#define DEACTIVE_ANGLE 15 * M_PI / 180.0
-#define DEACTIVE_DUR 50
+#define DEACTIVE_ANGLE 17 * M_PI / 180.0
+#define DEACTIVE_DUR 500
 
 bool activated = false;
 long lastChangedAt = 0;
