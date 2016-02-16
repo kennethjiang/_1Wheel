@@ -5,10 +5,10 @@
 
 //#define SPEED_GAIN 0.006
 #define SPEED_GAIN 0.000
-#define ANGLE_GAIN 18.0
-#define ANGLE_RATE_GAIN 5.0
+#define ANGLE_GAIN 96.0
+#define ANGLE_RATE_GAIN 15.0
 
-#define ANGLE_OFFSET = -0.03054  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
+#define ANGLE_OFFSET 0.03054  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
 float desiredSpeed = 0.0;
 
@@ -56,6 +56,7 @@ void loop() {
     float angleRate = float(readGyro()[0]) * M_PI / 180.0;  // gyro_x is the rate of tilting, in radians
 
     if (!shouldBeActivated(angle)) {
+      Serial.println("NO!!!");
       desiredSpeed = 0.0;
       shutoff();
       return;
@@ -95,8 +96,8 @@ void loop() {
 
 #define ACTIVE_ANGLE 10 * M_PI / 180.0
 #define ACTIVE_DUR 100
-#define DEACTIVE_ANGLE 17 * M_PI / 180.0
-#define DEACTIVE_DUR 500
+#define DEACTIVE_ANGLE 16 * M_PI / 180.0
+#define DEACTIVE_DUR 1000
 
 bool activated = false;
 long lastChangedAt = 0;
