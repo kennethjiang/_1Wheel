@@ -6,7 +6,7 @@
 //#define SPEED_GAIN 0.006
 #define SPEED_GAIN 0.000
 #define ANGLE_GAIN 96.0
-#define ANGLE_RATE_GAIN 15.0
+#define ANGLE_RATE_GAIN 30.0
 
 #define ANGLE_OFFSET 0.00  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
@@ -55,6 +55,10 @@ void loop() {
     float angle = ypr[2] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians
     float angleRate = float(readGyro()[0]) * M_PI / 180.0;  // gyro_x is the rate of tilting, in radians
 
+    Serial.print(angle);
+    Serial.print("\t");
+    Serial.println(angleRate);
+    
     if (!shouldBeActivated(angle)) {
       Serial.println("NO!!!");
       desiredSpeed = 0.0;
@@ -65,6 +69,8 @@ void loop() {
     // balanceTorque is the output to motor just to keep it balanced
     float balanceTorque = ANGLE_GAIN * angle + ANGLE_RATE_GAIN * angleRate;
 
+    Serial.println(balanceTorque);
+    
     //this is not current speed. We do not know actual speed as we have no wheel rotation encoders. This is a type of accelerator pedal effect:
     //this variable increases with each loop of the program IF board is deliberately held at an angle (by rider for example)
     //So it means "if we are STILL tilted, speed up a bit" and it keeps accelerating as long as you hold it tilted.
@@ -80,7 +86,7 @@ void loop() {
       desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN * (millis() - lastCycle))) * 0.999;
     }
     lastCycle = millis();
-      
+
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
 
     Serial.println(duty, 6);
