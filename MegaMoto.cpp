@@ -2,10 +2,6 @@
 
 #include "MegaMoto.h"
 
-int enablePin = 8;
-int pWMPinA = 11;  // Timer2
-int pWMPinB = 3;
-
 // ================================================================
 // ===        SETUP                                             ===
 // ================================================================
@@ -78,8 +74,10 @@ void driveMotor(int duty) {
   duty = cappedDuty(duty);
 
   if (duty >= 0) {
+    duty = duty * POS_GAIN;
     forward(duty);
   } else {
+    duty = duty * NEG_GAIN;
     reverse(duty*-1);
   }
 }
