@@ -5,7 +5,7 @@
 
 //#define SPEED_GAIN 0.006
 #define SPEED_GAIN 0.000
-#define ANGLE_GAIN 110.0
+#define ANGLE_GAIN 140.0
 #define ANGLE_RATE_GAIN -60.0
 
 #define ANGLE_OFFSET 0.00  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
@@ -102,7 +102,7 @@ void loop() {
 
 #define ACTIVE_ANGLE 15 * M_PI / 180.0
 #define ACTIVE_DUR 100
-#define DEACTIVE_ANGLE 30 * M_PI / 180.0
+#define DEACTIVE_ANGLE 35 * M_PI / 180.0
 #define DEACTIVE_DUR 1000
 
 bool activated = false;
