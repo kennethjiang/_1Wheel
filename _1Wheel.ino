@@ -4,8 +4,8 @@
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
 //#define SPEED_GAIN 0.006
-#define SPEED_GAIN 0.000
-#define ANGLE_GAIN 140.0
+#define SPEED_GAIN 0.00
+#define ANGLE_GAIN 120.0
 #define ANGLE_RATE_GAIN -60.0
 
 #define ANGLE_OFFSET 0.05  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
@@ -96,9 +96,9 @@ void loop() {
 // ================================================================
 
 #define ACTIVE_ANGLE 15 * M_PI / 180.0
-#define ACTIVE_DUR 20
+#define ACTIVE_DUR 100
 #define DEACTIVE_ANGLE 30 * M_PI / 180.0
-#define DEACTIVE_DUR 1000
+#define DEACTIVE_DUR 50
 
 bool activated = false;
 long lastChangedAt = 0;

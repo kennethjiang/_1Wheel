@@ -21,8 +21,8 @@ void megaMotoSetup() {
 // ===        CAP MOTOR OUTPUT CHANGE                           ===
 // ================================================================
 
-#define MAX_DUTY_CHANGE_RATE 1700.0  // Change of duty should not exceed 10 per second
-#define MAX_DUTY 140.0 // CAP max duty for testing
+#define MAX_DUTY_CHANGE_RATE 3700.0  // Change of duty should not exceed 10 per second
+#define MAX_DUTY 255.0 // CAP max duty for testing
 int lastDuty = 0;
 long lastDutyTime = 0;
 

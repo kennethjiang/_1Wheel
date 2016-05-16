@@ -8,7 +8,7 @@
 #define pWMPinB 3
 
 // Motor doesn't output same torque on both directions. Adjust output accordingly
-#define POS_GAIN 1.2
+#define POS_GAIN 1.5
 #define NEG_GAIN 1.0
 
 // Should be called from main program's setup()
