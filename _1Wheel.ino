@@ -7,7 +7,7 @@
 // SPEED_GAIN = Ki
 // ANGLE_GAIN = Kp
 // ANGLE_RATE_GAIN = Kd
-#define SPEED_GAIN 0.5
+#define SPEED_GAIN 0.6
 #define ANGLE_GAIN 120.0
 #define ANGLE_RATE_GAIN -60.0
 
