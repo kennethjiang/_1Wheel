@@ -3,6 +3,10 @@
 
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
+//This is essentially PID algorithm:
+// SPEED_GAIN = Ki
+// ANGLE_GAIN = Kp
+// ANGLE_RATE_GAIN = Kd
 #define SPEED_GAIN 0.5
 #define ANGLE_GAIN 120.0
 #define ANGLE_RATE_GAIN -60.0
