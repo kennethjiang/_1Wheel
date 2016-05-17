@@ -3,8 +3,7 @@
 
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
-//#define SPEED_GAIN 0.006
-#define SPEED_GAIN 0.00
+#define SPEED_GAIN 0.5
 #define ANGLE_GAIN 120.0
 #define ANGLE_RATE_GAIN -60.0
 
@@ -13,8 +12,6 @@
 float desiredSpeed = 0.0;
 
 float overallGain = 4.0;
-
-long lastCycle = 0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -63,8 +60,6 @@ void loop() {
 
     // balanceTorque is the output to motor just to keep it balanced
     float balanceTorque = ANGLE_GAIN * angle + ANGLE_RATE_GAIN * angleRate;
-
-//    Serial.println(balanceTorque);
     
     //this is not current speed. We do not know actual speed as we have no wheel rotation encoders. This is a type of accelerator pedal effect:
     //this variable increases with each loop of the program IF board is deliberately held at an angle (by rider for example)
@@ -77,14 +72,13 @@ void loop() {
     //The 0.999 means that if you bring board level after a long period tilted forwards, the cur_speed value magically decays away to nothing and your board
     //is now not only stationary but also level!
 
-    if (lastCycle != 0) {
-      desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN * (millis() - lastCycle))) * 0.999;
-    }
-    lastCycle = millis();
+    desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN)) * 0.999;
 
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
 
-    Serial.println(duty, 6);
+    Serial.print(balanceTorque, 6);
+    Serial.print(",");
+    Serial.println(desiredSpeed, 6);
 
     driveMotor((int) duty);
 
