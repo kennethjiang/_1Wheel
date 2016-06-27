@@ -1,18 +1,19 @@
 #include <Arduino.h>
 
-#include "MegaMoto.h"
+#include "Cytron.h"
 
 // ================================================================
 // ===        SETUP                                             ===
 // ================================================================
 
 
-void megaMotoSetup() {                
-  // initialize the digital pin as an output.
-  // Pin 13 has an LED connected on most Arduino boards:
-  pinMode(pWMPinA, OUTPUT);
-  pinMode(pWMPinB, OUTPUT);
-//  setPwmFrequency(pWMPinA, 8);  // change Timer2 divisor to 8 gives 3.9kHz PWM freq
+void driverSetup() {
+  pinMode(enablePullDownPin,OUTPUT);
+  pinMode(enablePin,INPUT_PULLUP); 
+  pinMode(pWMPin,OUTPUT);
+  pinMode(dirPin,OUTPUT);
+  
+  digitalWrite(enablePullDownPin, LOW);
 }
 
 
@@ -21,21 +22,9 @@ void megaMotoSetup() {
 // ===        CAP MOTOR OUTPUT CHANGE                           ===
 // ================================================================
 
-#define MAX_DUTY_CHANGE_RATE 3700.0  // Change of duty should not exceed 10 per second
-#define MAX_DUTY 255.0 // CAP max duty for testing
-int lastDuty = 0;
-long lastDutyTime = 0;
+#define MAX_DUTY 100.0 // CAP max duty for testing
 
-int cappedDuty(int duty) {
-  long elapsedTime = millis() - lastDutyTime;
-  float maxAllowedChange = ((float) elapsedTime) / 1000.0 * MAX_DUTY_CHANGE_RATE;
-  
-  if (abs(duty-lastDuty) > maxAllowedChange) {
-    int posOrNeg = (duty-lastDuty) > 0 ? 1.0 : -1.0;
-    duty = lastDuty + (int) (maxAllowedChange * posOrNeg);
-    Serial.println("CAPPED duty change rate");
-  }
-
+int capped(int duty) {
   if (duty > MAX_DUTY) {
     duty = MAX_DUTY;
     Serial.println("CAPPED duty");
@@ -46,9 +35,6 @@ int cappedDuty(int duty) {
     Serial.println("CAPPED duty");
   }
   
-  lastDuty = duty;
-  lastDutyTime = millis();
-
   return duty;
 }
 
@@ -58,33 +44,31 @@ int cappedDuty(int duty) {
 
 
 // duty: 0-255, 0: stop; 255: maximum speed
-void forward(int duty) {
-  analogWrite(pWMPinB, 0);
-  analogWrite(pWMPinA, duty);
-}
 
-// duty: 0-255, 0: stop; 255: maximum speed
-void reverse(int duty) {
-  analogWrite(pWMPinA, 0);
-  analogWrite(pWMPinB, duty);
-}
+void drive(int duty) {
+  if (digitalRead(enablePin) == HIGH) {
+    disableMotor();
+  }
 
-void driveMotor(int duty) {
   duty *= DIRECTION;
-  duty = cappedDuty(duty);
+  duty = capped(duty);
 
   if (duty >= 0) {
     duty = duty * POS_GAIN;
-    forward(duty);
   } else {
     duty = duty * NEG_GAIN;
-    reverse(duty*-1);
   }
+
+  duty *= 0.5;
+  duty += 128;
+
+  digitalWrite(pWMPin,HIGH);
+  analogWrite(dirPin,duty);
 }
 
-void shutoff() {
-  analogWrite(pWMPinA, 0);
-  analogWrite(pWMPinB, 0);
+void disableMotor() {
+  digitalWrite(pWMPin,LOW);
+  analogWrite(dirPin,128);
 }
 
 
@@ -122,33 +106,33 @@ void shutoff() {
  *   http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1235060559/0#4
  */
  
-//void setPwmFrequency(int pin, int divisor) {
-//  byte mode;
-//  if(pin == 5 || pin == 6 || pin == 9 || pin == 10) { // Timer0 or Timer1
-//    switch(divisor) {
-//      case 1: mode = 0x01; break;
-//      case 8: mode = 0x02; break;
-//      case 64: mode = 0x03; break;
-//      case 256: mode = 0x04; break;
-//      case 1024: mode = 0x05; break;
-//      default: return;
-//    }
-//    if(pin == 5 || pin == 6) { 
-//      TCCR0B = TCCR0B & 0b11111000 | mode; // Timer0
-//    } else {
-//      TCCR1B = TCCR1B & 0b11111000 | mode; // Timer1
-//    }
-//  } else if(pin == 3 || pin == 11) {
-//    switch(divisor) {
-//      case 1: mode = 0x01; break;
-//      case 8: mode = 0x02; break;
-//      case 32: mode = 0x03; break;
-//      case 64: mode = 0x04; break;
-//      case 128: mode = 0x05; break;
-//      case 256: mode = 0x06; break;
-//      case 1024: mode = 0x7; break;
-//      default: return;
-//    }
-//    TCCR2B = TCCR2B & 0b11111000 | mode; // Timer2
-//  }
-//}
+void setPwmFrequency(int pin, int divisor) {
+  byte mode;
+  if(pin == 5 || pin == 6 || pin == 9 || pin == 10) { // Timer0 or Timer1
+    switch(divisor) {
+      case 1: mode = 0x01; break;
+      case 8: mode = 0x02; break;
+      case 64: mode = 0x03; break;
+      case 256: mode = 0x04; break;
+      case 1024: mode = 0x05; break;
+      default: return;
+    }
+    if(pin == 5 || pin == 6) { 
+      TCCR0B = TCCR0B & 0b11111000 | mode; // Timer0
+    } else {
+      TCCR1B = TCCR1B & 0b11111000 | mode; // Timer1
+    }
+  } else if(pin == 3 || pin == 11) {
+    switch(divisor) {
+      case 1: mode = 0x01; break;
+      case 8: mode = 0x02; break;
+      case 32: mode = 0x03; break;
+      case 64: mode = 0x04; break;
+      case 128: mode = 0x05; break;
+      case 256: mode = 0x06; break;
+      case 1024: mode = 0x7; break;
+      default: return;
+    }
+    TCCR2B = TCCR2B & 0b11111000 | mode; // Timer2
+  }
+}

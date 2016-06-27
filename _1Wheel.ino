@@ -1,5 +1,5 @@
 #include "Mpu6050.h"
-#include "MegaMoto.h"
+#include "Cytron.h"
 
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
@@ -7,8 +7,8 @@
 // SPEED_GAIN = Ki
 // ANGLE_GAIN = Kp
 // ANGLE_RATE_GAIN = Kd
-#define SPEED_GAIN 0.6
-#define ANGLE_GAIN 120.0
+#define SPEED_GAIN 0.5
+#define ANGLE_GAIN 140.0
 #define ANGLE_RATE_GAIN -60.0
 
 #define ANGLE_OFFSET 0.05  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
@@ -32,7 +32,7 @@ void setup() {
     Serial.begin(115200);
 
     mpu6050Setup();
-    megaMotoSetup();
+    driverSetup();
 }
 
 // ================================================================
@@ -49,7 +49,7 @@ void loop() {
     float *ypr = readYpr();
 
     if (ypr == NULL) {
-       shutoff();  // something is wrong, shut off motor
+       disableMotor();  // something is wrong, shut off motor
        return;
     }
 
@@ -58,7 +58,7 @@ void loop() {
 
     if (!shouldBeActivated(angle)) {
       desiredSpeed = 0.0;
-      shutoff();
+      disableMotor();
       return;
     }
 
@@ -84,7 +84,7 @@ void loop() {
     Serial.print(",");
     Serial.println(desiredSpeed, 6);
 
-    driveMotor((int) duty);
+    drive((int) duty);
 
 }
 
