@@ -47,7 +47,9 @@ int capped(int duty) {
 
 void drive(int duty) {
   if (digitalRead(enablePin) == HIGH) {
+    Serial.println("DEADMAN BUTTON triggered!");
     disableMotor();
+    return;
   }
 
   duty *= DIRECTION;
@@ -62,6 +64,7 @@ void drive(int duty) {
   duty *= 0.5;
   duty += 128;
 
+  Serial.println(duty);
   digitalWrite(pWMPin,HIGH);
   analogWrite(dirPin,duty);
 }

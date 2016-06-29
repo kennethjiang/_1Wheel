@@ -11,11 +11,11 @@
 #define ANGLE_GAIN 140.0
 #define ANGLE_RATE_GAIN -60.0
 
-#define ANGLE_OFFSET 0.05  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
+#define ANGLE_OFFSET -0.0872665  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
 float desiredSpeed = 0.0;
 
-float overallGain = 4.0;
+float overallGain = 2.0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -77,15 +77,8 @@ void loop() {
     //is now not only stationary but also level!
 
     desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN)) * 0.999;
-
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
-
-    Serial.print(balanceTorque, 6);
-    Serial.print(",");
-    Serial.println(desiredSpeed, 6);
-
     drive((int) duty);
-
 }
 
 
@@ -93,9 +86,9 @@ void loop() {
 // ===                    ACTIVATION                           ====
 // ================================================================
 
-#define ACTIVE_ANGLE 15 * M_PI / 180.0
-#define ACTIVE_DUR 100
-#define DEACTIVE_ANGLE 30 * M_PI / 180.0
+#define ACTIVE_ANGLE 3 * M_PI / 180.0
+#define ACTIVE_DUR 500
+#define DEACTIVE_ANGLE 18 * M_PI / 180.0
 #define DEACTIVE_DUR 50
 
 bool activated = false;
