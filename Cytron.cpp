@@ -8,12 +8,8 @@
 
 
 void driverSetup() {
-  pinMode(enablePullDownPin,OUTPUT);
-  pinMode(enablePin,INPUT_PULLUP); 
   pinMode(pWMPin,OUTPUT);
   pinMode(dirPin,OUTPUT);
-  
-  digitalWrite(enablePullDownPin, LOW);
 }
 
 
@@ -27,12 +23,12 @@ void driverSetup() {
 int capped(int duty) {
   if (duty > MAX_DUTY) {
     duty = MAX_DUTY;
-    Serial.println("CAPPED duty");
+//    Serial.println("CAPPED duty");
   }
 
   if (duty < MAX_DUTY * -1) {
     duty = MAX_DUTY * -1;
-    Serial.println("CAPPED duty");
+//    Serial.println("CAPPED duty");
   }
   
   return duty;
@@ -46,12 +42,6 @@ int capped(int duty) {
 // duty: 0-255, 0: stop; 255: maximum speed
 
 void drive(int duty) {
-  if (digitalRead(enablePin) == HIGH) {
-    Serial.println("DEADMAN BUTTON triggered!");
-    disableMotor();
-    return;
-  }
-
   duty *= DIRECTION;
   duty = capped(duty);
 
@@ -64,7 +54,7 @@ void drive(int duty) {
   duty *= 0.5;
   duty += 128;
 
-  Serial.println(duty);
+//  Serial.println(duty);
   digitalWrite(pWMPin,HIGH);
   analogWrite(dirPin,duty);
 }

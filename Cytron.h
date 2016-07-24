@@ -3,8 +3,6 @@
 
 #define DIRECTION 1
 
-#define enablePin 8
-#define enablePullDownPin 12
 #define pWMPin 7
 #define dirPin 6
 

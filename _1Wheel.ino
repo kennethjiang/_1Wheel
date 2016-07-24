@@ -2,20 +2,22 @@
 #include "Cytron.h"
 
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
+#define enablePin 8
+#define enablePullDownPin 12
 
 //This is essentially PID algorithm:
 // SPEED_GAIN = Ki
 // ANGLE_GAIN = Kp
 // ANGLE_RATE_GAIN = Kd
-#define SPEED_GAIN 0.5
+#define SPEED_GAIN 0.0
 #define ANGLE_GAIN 140.0
-#define ANGLE_RATE_GAIN -60.0
+#define ANGLE_RATE_GAIN 60.0
 
-#define ANGLE_OFFSET -0.0872665  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
+#define ANGLE_OFFSET -0.076  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
 float desiredSpeed = 0.0;
 
-float overallGain = 2.0;
+float overallGain = 4.0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -25,6 +27,8 @@ void setup() {
   
     // configure LED for output
     pinMode(LED_PIN, OUTPUT);
+    pinMode(enablePullDownPin,OUTPUT);
+    pinMode(enablePin,INPUT_PULLUP); 
     
     // initialize serial communication
     // (115200 chosen because it is required for Teapot Demo output, but it's
@@ -33,6 +37,7 @@ void setup() {
 
     mpu6050Setup();
     driverSetup();
+    digitalWrite(enablePullDownPin, LOW);
 }
 
 // ================================================================
@@ -52,10 +57,18 @@ void loop() {
        disableMotor();  // something is wrong, shut off motor
        return;
     }
+    if (digitalRead(enablePin) == HIGH) {
+      disableMotor();
+//      Serial.println("DISABLED!");
+      return;
+    }
 
-    float angle = ypr[2] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians
+    float angle = ypr[2] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians 
     float angleRate = float(readGyro()[0]) * M_PI / 180.0;  // gyro_x is the rate of tilting, in radians
-
+       Serial.print(angle*20, 8);
+          Serial.print(",");
+       Serial.println(angleRate, 8);
+       
     if (!shouldBeActivated(angle)) {
       desiredSpeed = 0.0;
       disableMotor();
@@ -78,6 +91,7 @@ void loop() {
 
     desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN)) * 0.999;
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
+//    Serial.println(duty);
     drive((int) duty);
 }
 
