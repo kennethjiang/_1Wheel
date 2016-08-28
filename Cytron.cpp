@@ -8,8 +8,12 @@
 
 
 void driverSetup() {
+  pinMode(enablePullDownPin,OUTPUT);
+  pinMode(enablePin,INPUT_PULLUP); 
   pinMode(pWMPin,OUTPUT);
   pinMode(dirPin,OUTPUT);
+  
+  digitalWrite(enablePullDownPin, LOW);
 }
 
 
@@ -20,18 +24,36 @@ void driverSetup() {
 
 #define MAX_DUTY 100.0 // CAP max duty for testing
 
-int capped(int duty) {
-  if (duty > MAX_DUTY) {
-    duty = MAX_DUTY;
-//    Serial.println("CAPPED duty");
-  }
+#define MAX_DUTY_CHANGE_RATE 300.0  // Change of duty should not exceed 10 per second
+int lastDuty = 0;
+long lastDutyTime = 0;
 
-  if (duty < MAX_DUTY * -1) {
-    duty = MAX_DUTY * -1;
-//    Serial.println("CAPPED duty");
-  }
-  
-  return duty;
+int capped(int duty) {
+   long elapsedTime = millis() - lastDutyTime;
+   float maxAllowedChange = ((float) elapsedTime) / 1000.0 * MAX_DUTY_CHANGE_RATE;
+   
+   if (abs(duty-lastDuty) > maxAllowedChange) {
+     int posOrNeg = (duty-lastDuty) > 0 ? 1.0 : -1.0;
+     duty = lastDuty + (int) (maxAllowedChange * posOrNeg);
+//     Serial.println("CAPPED duty change rate");
+   }
+ 
+   if (duty > MAX_DUTY) {
+     duty = MAX_DUTY;
+     Serial.println("CAPPED duty");
+   }
+ 
+   if (duty < MAX_DUTY * -1) {
+     duty = MAX_DUTY * -1;
+     Serial.println("CAPPED duty");
+   }
+
+   Serial.println(duty/10.0, 8);
+   
+   lastDuty = duty;
+   lastDutyTime = millis();
+ 
+   return duty;
 }
 
 // ================================================================
@@ -53,6 +75,12 @@ void drive(int duty) {
 
   duty *= 0.5;
   duty += 128;
+
+    if (digitalRead(enablePin) == HIGH) {
+      disableMotor();
+//      Serial.println("DISABLED!");
+      return;
+    }
 
 //  Serial.println(duty);
   digitalWrite(pWMPin,HIGH);

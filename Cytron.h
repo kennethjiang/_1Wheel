@@ -5,6 +5,9 @@
 
 #define pWMPin 7
 #define dirPin 6
+#define enablePin 8
+#define enablePullDownPin 12
+
 
 // Motor doesn't output same torque on both directions. Adjust output accordingly
 #define POS_GAIN 1.0
