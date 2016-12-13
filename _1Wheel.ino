@@ -81,8 +81,7 @@ void loop() {
 
     desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN)) * 0.999;
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
-    Serial.print(duty/10.0, 8);
-          Serial.print(",");   
+    Serial.println(duty/10.0, 8);
     drive((int) duty);
 }
 
@@ -92,7 +91,7 @@ void loop() {
 // ================================================================
 
 #define ACTIVE_ANGLE 3 * M_PI / 180.0
-#define ACTIVE_DUR 500
+#define ACTIVE_DUR 300
 #define DEACTIVE_ANGLE 18 * M_PI / 180.0
 #define DEACTIVE_DUR 50
 
