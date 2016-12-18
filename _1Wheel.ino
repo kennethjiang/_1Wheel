@@ -53,8 +53,8 @@ void loop() {
        return;
     }
 
-    float angle = ypr[2] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians 
-    float angleRate = float(readGyro()[0]) * M_PI / 180.0;  // gyro_x is the rate of tilting, in radians
+    float angle = ypr[1] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians 
+    float angleRate = float(readGyro()[1]) * M_PI / 180.0;  // gyro_y is the rate of tilting, in radians
        Serial.print(angle*20, 8);
           Serial.print(",");
        Serial.print(angleRate, 8);

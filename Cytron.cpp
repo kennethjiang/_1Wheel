@@ -8,12 +8,9 @@
 
 
 void driverSetup() {
-  pinMode(enablePullDownPin,OUTPUT);
   pinMode(enablePin,INPUT_PULLUP); 
   pinMode(pWMPin,OUTPUT);
   pinMode(dirPin,OUTPUT);
-  
-  digitalWrite(enablePullDownPin, LOW);
 }
 
 
