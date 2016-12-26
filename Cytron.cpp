@@ -37,15 +37,13 @@ int capped(int duty) {
  
    if (duty > MAX_DUTY) {
      duty = MAX_DUTY;
-     Serial.println("CAPPED duty");
+//     Serial.println("CAPPED duty");
    }
  
    if (duty < MAX_DUTY * -1) {
      duty = MAX_DUTY * -1;
-     Serial.println("CAPPED duty");
+//     Serial.println("CAPPED duty");
    }
-
-   Serial.println(duty/10.0, 8);
    
    lastDuty = duty;
    lastDutyTime = millis();
@@ -73,13 +71,14 @@ void drive(int duty) {
   duty *= 0.5;
   duty += 128;
 
-    if (digitalRead(enablePin) == HIGH) {
-      disableMotor();
+  if (digitalRead(enablePin) == HIGH) {
+    disableMotor();
 //      Serial.println("DISABLED!");
-      return;
-    }
-
-//  Serial.println(duty);
+    return;
+  }
+  
+//  Serial.println(duty/10.0, 8);
+  
   digitalWrite(pWMPin,HIGH);
   analogWrite(dirPin,duty);
 }

@@ -11,7 +11,7 @@
 #define ANGLE_GAIN 140.0
 #define ANGLE_RATE_GAIN 30.0
 
-#define ANGLE_OFFSET -0.076  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
+#define ANGLE_OFFSET -0.115  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
 float desiredSpeed = 0.0;
 
@@ -53,12 +53,12 @@ void loop() {
        return;
     }
 
-    float angle = ypr[1] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians 
-    float angleRate = float(readGyro()[1]) * M_PI / 180.0;  // gyro_y is the rate of tilting, in radians
-       Serial.print(angle*20, 8);
-          Serial.print(",");
-       Serial.print(angleRate, 8);
-          Serial.print(",");       
+    float angle = ypr[1] + ANGLE_OFFSET; // pitch is how much the board tilts, in radians
+    float angleRate = -1.0 * float(readGyro()[1]) * M_PI / 180.0;  // gyro_y is the rate of tilting, in radians
+//       Serial.print(angle*20, 8);
+//          Serial.print(",");
+//       Serial.print(angleRate, 8);
+//          Serial.println(",");       
     if (!shouldBeActivated(angle)) {
       desiredSpeed = 0.0;
       disableMotor();
