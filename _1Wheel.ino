@@ -9,7 +9,7 @@
 // ANGLE_RATE_GAIN = Kd
 #define SPEED_GAIN 0.5
 #define ANGLE_GAIN 140.0
-#define ANGLE_RATE_GAIN 30.0
+#define ANGLE_RATE_GAIN 45.0
 
 #define ANGLE_OFFSET -0.115  // Sensor is not perfectly level and needs offset. Caliberate your own and set accordingly
 
@@ -81,7 +81,7 @@ void loop() {
 
     desiredSpeed = (float) (desiredSpeed + (angle * SPEED_GAIN)) * 0.999;
     float duty = (float)(balanceTorque + desiredSpeed) * overallGain;
-    Serial.println(duty/10.0, 8);
+//    Serial.println(duty/10.0, 8);
     drive((int) duty);
 }
 

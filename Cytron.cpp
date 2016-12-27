@@ -77,7 +77,7 @@ void drive(int duty) {
     return;
   }
   
-//  Serial.println(duty/10.0, 8);
+  Serial.println(duty/10.0, 8);
   
   digitalWrite(pWMPin,HIGH);
   analogWrite(dirPin,duty);
